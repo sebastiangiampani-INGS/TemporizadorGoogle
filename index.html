@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Temporizador</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;600;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --g-blue:#4285F4;
+  --g-red:#EA4335;
+  --g-yellow:#FBBC05;
+  --g-green:#34A853;
+  --bg:#111;
+  --card:#1c1c1c;
+  --text:#fff;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Roboto Flex", sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+
+.container{
+  text-align:center;
+  width:100%;
+  max-width:800px;
+  padding:20px;
+}
+
+h1{
+  font-weight:600;
+  margin-bottom:20px;
+}
+
+.timer{
+  font-family:"Roboto Mono", monospace;
+  font-size:clamp(80px, 15vw, 160px);
+  font-weight:700;
+  letter-spacing:4px;
+  margin:20px 0;
+}
+
+.blue{color:var(--g-blue);}
+.red{color:var(--g-red);}
+.yellow{color:var(--g-yellow);}
+.green{color:var(--g-green);}
+
+.controls{
+  margin-top:20px;
+}
+
+input{
+  padding:8px;
+  font-size:16px;
+  border-radius:6px;
+  border:none;
+  width:80px;
+  text-align:center;
+}
+
+button{
+  padding:10px 15px;
+  font-size:15px;
+  border:none;
+  border-radius:6px;
+  margin:5px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.start{background:var(--g-blue); color:#fff;}
+.pause{background:var(--g-yellow);}
+.reset{background:var(--g-red); color:#fff;}
+.full{background:var(--g-green); color:#fff;}
+
+.share{
+  margin-top:15px;
+  width:100%;
+  padding:8px;
+  font-size:14px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1 id="title">Temporizador</h1>
+
+  <div class="timer">
+    <span class="blue" id="m1">0</span>
+    <span class="red" id="m2">0</span>
+    <span>:</span>
+    <span class="yellow" id="s1">0</span>
+    <span class="green" id="s2">0</span>
+  </div>
+
+  <div class="controls">
+    <input type="number" id="min" min="0" value="1"> :
+    <input type="number" id="sec" min="0" max="59" value="0">
+    <br>
+    <button class="start" onclick="start()">Start</button>
+    <button class="pause" onclick="pause()">Pause</button>
+    <button class="reset" onclick="resetTimer()">Reset</button>
+    <button class="full" onclick="toggleFull()">Pantalla Completa</button>
+  </div>
+
+  <input class="share" id="share" readonly>
+</div>
+
+<script>
+let total=60;
+let remaining=60;
+let interval=null;
+
+const m1=document.getElementById("m1");
+const m2=document.getElementById("m2");
+const s1=document.getElementById("s1");
+const s2=document.getElementById("s2");
+
+function updateDisplay(){
+  let m=Math.floor(remaining/60);
+  let s=remaining%60;
+  let str=(m<10?"0"+m:m)+(s<10?"0"+s:s);
+  m1.textContent=str[0];
+  m2.textContent=str[1];
+  s1.textContent=str[2];
+  s2.textContent=str[3];
+}
+
+function start(){
+  if(interval) return;
+  interval=setInterval(()=>{
+    if(remaining>0){
+      remaining--;
+      updateDisplay();
+    } else{
+      clearInterval(interval);
+      interval=null;
+      beep();
+    }
+  },1000);
+}
+
+function pause(){
+  clearInterval(interval);
+  interval=null;
+}
+
+function resetTimer(){
+  pause();
+  setFromInputs();
+}
+
+function setFromInputs(){
+  let m=parseInt(document.getElementById("min").value)||0;
+  let s=parseInt(document.getElementById("sec").value)||0;
+  total=m*60+s;
+  remaining=total;
+  updateDisplay();
+  buildLink();
+}
+
+function toggleFull(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen();
+  }else{
+    document.exitFullscreen();
+  }
+}
+
+function beep(){
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const osc=ctx.createOscillator();
+  osc.frequency.value=800;
+  osc.connect(ctx.destination);
+  osc.start();
+  setTimeout(()=>{osc.stop();ctx.close();},500);
+}
+
+function buildLink(){
+  const url=new URL(window.location);
+  url.searchParams.set("t",total);
+  document.getElementById("share").value=url;
+}
+
+function readParams(){
+  const p=new URLSearchParams(window.location.search);
+  if(p.get("t")){
+    total=parseInt(p.get("t"));
+    remaining=total;
+  }
+  if(p.get("title")){
+    document.getElementById("title").textContent=p.get("title");
+  }
+  if(p.get("autostart")==="1"){
+    start();
+  }
+}
+
+document.getElementById("min").addEventListener("input",setFromInputs);
+document.getElementById("sec").addEventListener("input",setFromInputs);
+
+setFromInputs();
+readParams();
+updateDisplay();
+</script>
+</body>
+</html>
