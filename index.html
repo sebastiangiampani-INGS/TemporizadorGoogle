@@ -1,219 +1,528 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Temporizador</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>El Temporizador de Google de Valen</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;600;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;600;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-<style>
-:root{
-  --g-blue:#4285F4;
-  --g-red:#EA4335;
-  --g-yellow:#FBBC05;
-  --g-green:#34A853;
-  --bg:#111;
-  --card:#1c1c1c;
-  --text:#fff;
-}
+  <style>
+    :root{
+      /* Colores oficiales Google */
+      --g-blue:#4285F4;
+      --g-red:#EA4335;
+      --g-yellow:#FBBC05;
+      --g-green:#34A853;
 
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:"Roboto Flex", sans-serif;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-}
+      --bg:#0f0f10;
+      --text:#ffffff;
+      --muted: rgba(255,255,255,.7);
+      --panel: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.12);
+    }
 
-.container{
-  text-align:center;
-  width:100%;
-  max-width:800px;
-  padding:20px;
-}
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background: radial-gradient(1200px 700px at 25% 20%, rgba(66,133,244,.18), transparent 55%),
+                  radial-gradient(1200px 700px at 75% 80%, rgba(52,168,83,.14), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      font-family:"Roboto Flex", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right))
+               max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+    }
 
-h1{
-  font-weight:600;
-  margin-bottom:20px;
-}
+    .container{
+      width:min(980px, 100%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:14px;
+    }
 
-.timer{
-  font-family:"Roboto Mono", monospace;
-  font-size:clamp(80px, 15vw, 160px);
-  font-weight:700;
-  letter-spacing:4px;
-  margin:20px 0;
-}
+    h1{
+      margin:0;
+      font-weight:650;
+      font-size: clamp(18px, 2.2vw, 28px);
+      text-align:center;
+      letter-spacing:.2px;
+    }
 
-.blue{color:var(--g-blue);}
-.red{color:var(--g-red);}
-.yellow{color:var(--g-yellow);}
-.green{color:var(--g-green);}
+    .timerWrap{
+      width:100%;
+      background: linear-gradient(180deg, var(--panel), rgba(255,255,255,.03));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: clamp(14px, 2.2vw, 22px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 10px;
+    }
 
-.controls{
-  margin-top:20px;
-}
+    /* Display grande sin recortar */
+    .timer{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      overflow:hidden; /* evita que “explote” */
+    }
 
-input{
-  padding:8px;
-  font-size:16px;
-  border-radius:6px;
-  border:none;
-  width:80px;
-  text-align:center;
-}
+    .digits{
+      font-family:"Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-variant-numeric: tabular-nums;
+      font-weight:700;
+      line-height:1;
+      text-align:center;
+      /* clave: se adapta al ancho y alto, sin cortar */
+      font-size: clamp(56px, 12vw, 170px);
+      letter-spacing: clamp(1px, 0.4vw, 6px);
+      text-shadow: 0 12px 40px rgba(0,0,0,.55);
+      display:flex;
+      align-items:baseline;
+      justify-content:center;
+      gap: clamp(8px, 1.6vw, 18px);
+      flex-wrap:nowrap;
+    }
 
-button{
-  padding:10px 15px;
-  font-size:15px;
-  border:none;
-  border-radius:6px;
-  margin:5px;
-  cursor:pointer;
-  font-weight:600;
-}
+    .sep{
+      color: rgba(255,255,255,.85);
+      letter-spacing: 0;
+      opacity:.85;
+      transform: translateY(-0.03em);
+    }
+    .dot{
+      color: rgba(255,255,255,.85);
+      letter-spacing: 0;
+      opacity:.85;
+      transform: translateY(-0.06em);
+    }
 
-.start{background:var(--g-blue); color:#fff;}
-.pause{background:var(--g-yellow);}
-.reset{background:var(--g-red); color:#fff;}
-.full{background:var(--g-green); color:#fff;}
+    /* Colores por “bloque” */
+    .blue{ color:var(--g-blue); }
+    .red{ color:var(--g-red); }
+    .yellow{ color:var(--g-yellow); }
+    .green{ color:var(--g-green); }
 
-.share{
-  margin-top:15px;
-  width:100%;
-  padding:8px;
-  font-size:14px;
-}
-</style>
+    .hint{
+      font-size: 13px;
+      color: var(--muted);
+      text-align:center;
+      margin-top:2px;
+    }
+
+    .controls{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      width:100%;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      align-items:flex-start;
+      min-width: 120px;
+    }
+
+    label{
+      font-size:12px;
+      color: var(--muted);
+    }
+
+    input[type="number"], input[type="text"]{
+      padding:10px 12px;
+      border-radius:12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      outline:none;
+      width: 130px;
+      font-size:16px;
+    }
+    input[type="text"]{ width: min(520px, 100%); }
+
+    input:focus{
+      border-color: rgba(66,133,244,.55);
+      box-shadow: 0 0 0 4px rgba(66,133,244,.15);
+    }
+
+    button{
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      cursor:pointer;
+      font-weight: 700;
+      font-size: 15px;
+      color:#111;
+      transition: transform .06s ease, filter .15s ease;
+    }
+    button:active{ transform: translateY(1px); }
+
+    .start{ background: var(--g-blue); color:#fff; }
+    .pause{ background: var(--g-yellow); }
+    .reset{ background: var(--g-red); color:#fff; }
+    .full{ background: var(--g-green); color:#fff; }
+    .copy{ background: rgba(255,255,255,.12); border:1px solid var(--border); color:#fff; }
+
+    .shareBox{
+      width:min(860px, 100%);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+    }
+    #share{
+      flex:1;
+      min-width: 260px;
+      width:auto;
+    }
+
+    .status{
+      font-size: 13px;
+      color: var(--muted);
+      text-align:center;
+    }
+
+    /* en pantallas muy bajas, achicamos un toque más */
+    @media (max-height: 700px){
+      .digits{ font-size: clamp(46px, 11vw, 140px); }
+      .timerWrap{ padding: 14px; }
+    }
+  </style>
 </head>
 
 <body>
-<div class="container">
-  <h1 id="title">Temporizador</h1>
+  <div class="container">
+    <h1 id="pageTitle">El Temporizador de Google de Valen</h1>
 
-  <div class="timer">
-    <span class="blue" id="m1">0</span>
-    <span class="red" id="m2">0</span>
-    <span>:</span>
-    <span class="yellow" id="s1">0</span>
-    <span class="green" id="s2">0</span>
+    <div class="timerWrap" id="timerCard">
+      <div class="timer">
+        <!-- Formato: MM:SS.CC (CC = centésimas) -->
+        <div class="digits" aria-label="temporizador">
+          <span class="blue"   id="m1">0</span>
+          <span class="red"    id="m2">0</span>
+          <span class="sep">:</span>
+          <span class="yellow" id="s1">0</span>
+          <span class="green"  id="s2">0</span>
+          <span class="dot">.</span>
+          <span class="blue"   id="c1">0</span>
+          <span class="red"    id="c2">0</span>
+        </div>
+      </div>
+
+      <div class="hint">Espacio = Start/Pause · R = Reset · F = Pantalla completa</div>
+
+      <div class="controls">
+        <div class="row">
+          <div class="field">
+            <label for="min">Minutos</label>
+            <input type="number" id="min" min="0" max="999" value="6">
+          </div>
+          <div class="field">
+            <label for="sec">Segundos</label>
+            <input type="number" id="sec" min="0" max="59" value="5">
+          </div>
+          <div class="field">
+            <label for="title">Título (opcional)</label>
+            <input type="text" id="title" placeholder="El Temporizador de Google de Valen">
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="start" id="btnStart">Start</button>
+          <button class="pause" id="btnPause">Pause</button>
+          <button class="reset" id="btnReset">Reset</button>
+          <button class="full"  id="btnFull">Pantalla completa</button>
+        </div>
+
+        <div class="shareBox">
+          <input id="share" class="copy" readonly>
+          <button class="copy" id="btnCopy">Copiar link</button>
+        </div>
+
+        <div class="status" id="status">Listo.</div>
+      </div>
+    </div>
   </div>
-
-  <div class="controls">
-    <input type="number" id="min" min="0" value="1"> :
-    <input type="number" id="sec" min="0" max="59" value="0">
-    <br>
-    <button class="start" onclick="start()">Start</button>
-    <button class="pause" onclick="pause()">Pause</button>
-    <button class="reset" onclick="resetTimer()">Reset</button>
-    <button class="full" onclick="toggleFull()">Pantalla Completa</button>
-  </div>
-
-  <input class="share" id="share" readonly>
-</div>
 
 <script>
-let total=60;
-let remaining=60;
-let interval=null;
+(() => {
+  // ====== Utilidades ======
+  const $ = (id) => document.getElementById(id);
 
-const m1=document.getElementById("m1");
-const m2=document.getElementById("m2");
-const s1=document.getElementById("s1");
-const s2=document.getElementById("s2");
+  const m1 = $("m1"), m2 = $("m2"), s1 = $("s1"), s2 = $("s2"), c1 = $("c1"), c2 = $("c2");
+  const inMin = $("min"), inSec = $("sec"), inTitle = $("title");
+  const pageTitle = $("pageTitle");
+  const share = $("share");
+  const status = $("status");
 
-function updateDisplay(){
-  let m=Math.floor(remaining/60);
-  let s=remaining%60;
-  let str=(m<10?"0"+m:m)+(s<10?"0"+s:s);
-  m1.textContent=str[0];
-  m2.textContent=str[1];
-  s1.textContent=str[2];
-  s2.textContent=str[3];
-}
+  const btnStart = $("btnStart");
+  const btnPause = $("btnPause");
+  const btnReset = $("btnReset");
+  const btnFull  = $("btnFull");
+  const btnCopy  = $("btnCopy");
 
-function start(){
-  if(interval) return;
-  interval=setInterval(()=>{
-    if(remaining>0){
-      remaining--;
-      updateDisplay();
-    } else{
-      clearInterval(interval);
-      interval=null;
-      beep();
+  const pad2 = (n) => String(Math.max(0, n|0)).padStart(2, "0");
+
+  function clampInt(v, min, max){
+    v = Number(v);
+    if (!Number.isFinite(v)) v = 0;
+    v = Math.floor(v);
+    return Math.min(max, Math.max(min, v));
+  }
+
+  function beep(){
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.value = 880;
+      g.gain.value = 0.06;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      setTimeout(() => { o.stop(); ctx.close(); }, 650);
+    }catch(e){}
+  }
+
+  // ====== Estado ======
+  let initialMs = 0;
+  let remainingMs = 0;
+  let running = false;
+  let lastNow = null;
+  let raf = null;
+
+  function readParams(){
+    const p = new URLSearchParams(location.search);
+
+    // ?t=365 (segundos totales)
+    // o ?m=6&s=5
+    const t = p.get("t");
+    const m = p.get("m");
+    const s = p.get("s");
+    const autostart = (p.get("autostart") === "1" || p.get("autostart") === "true");
+    const title = p.get("title");
+
+    let totalSec = null;
+
+    if (t !== null && t !== ""){
+      const v = Number(t);
+      if (Number.isFinite(v) && v >= 0) totalSec = Math.floor(v);
+    } else if (m !== null || s !== null){
+      const mm = clampInt(m ?? 0, 0, 999);
+      const ss = clampInt(s ?? 0, 0, 59);
+      totalSec = mm * 60 + ss;
     }
-  },1000);
-}
 
-function pause(){
-  clearInterval(interval);
-  interval=null;
-}
+    if (title){
+      const tt = title.trim();
+      inTitle.value = tt;
+      pageTitle.textContent = tt || "El Temporizador de Google de Valen";
+      document.title = pageTitle.textContent;
+    } else {
+      pageTitle.textContent = "El Temporizador de Google de Valen";
+      document.title = pageTitle.textContent;
+    }
 
-function resetTimer(){
-  pause();
-  setFromInputs();
-}
-
-function setFromInputs(){
-  let m=parseInt(document.getElementById("min").value)||0;
-  let s=parseInt(document.getElementById("sec").value)||0;
-  total=m*60+s;
-  remaining=total;
-  updateDisplay();
-  buildLink();
-}
-
-function toggleFull(){
-  if(!document.fullscreenElement){
-    document.documentElement.requestFullscreen();
-  }else{
-    document.exitFullscreen();
+    if (totalSec !== null){
+      inMin.value = String(Math.floor(totalSec / 60));
+      inSec.value = String(totalSec % 60);
+      setFromInputs();
+      if (autostart && initialMs > 0) start();
+    } else {
+      setFromInputs();
+    }
   }
-}
 
-function beep(){
-  const ctx=new (window.AudioContext||window.webkitAudioContext)();
-  const osc=ctx.createOscillator();
-  osc.frequency.value=800;
-  osc.connect(ctx.destination);
-  osc.start();
-  setTimeout(()=>{osc.stop();ctx.close();},500);
-}
-
-function buildLink(){
-  const url=new URL(window.location);
-  url.searchParams.set("t",total);
-  document.getElementById("share").value=url;
-}
-
-function readParams(){
-  const p=new URLSearchParams(window.location.search);
-  if(p.get("t")){
-    total=parseInt(p.get("t"));
-    remaining=total;
+  function buildShareUrl(){
+    const url = new URL(location.href);
+    url.searchParams.set("t", String(Math.floor(initialMs / 1000)));
+    const title = inTitle.value.trim();
+    if (title) url.searchParams.set("title", title);
+    else url.searchParams.delete("title");
+    url.searchParams.delete("m");
+    url.searchParams.delete("s");
+    url.searchParams.delete("autostart");
+    share.value = url.toString();
   }
-  if(p.get("title")){
-    document.getElementById("title").textContent=p.get("title");
-  }
-  if(p.get("autostart")==="1"){
-    start();
-  }
-}
 
-document.getElementById("min").addEventListener("input",setFromInputs);
-document.getElementById("sec").addEventListener("input",setFromInputs);
+  function setFromInputs(){
+    const mm = clampInt(inMin.value, 0, 999);
+    const ss = clampInt(inSec.value, 0, 59);
+    inMin.value = String(mm);
+    inSec.value = String(ss);
 
-setFromInputs();
-readParams();
-updateDisplay();
+    initialMs = (mm * 60 + ss) * 1000;
+    remainingMs = initialMs;
+
+    // si cambian inputs mientras corre: primero pausa
+    if (running) pause();
+
+    render();
+    buildShareUrl();
+    status.textContent = "Listo.";
+  }
+
+  function render(){
+    const ms = Math.max(0, remainingMs|0);
+    const totalSec = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSec / 60);
+    const seconds = totalSec % 60;
+
+    // centésimas (00–99)
+    const centis = Math.floor((ms % 1000) / 10);
+
+    const MM = pad2(minutes);
+    const SS = pad2(seconds);
+    const CC = pad2(centis);
+
+    m1.textContent = MM[0];
+    m2.textContent = MM[1];
+    s1.textContent = SS[0];
+    s2.textContent = SS[1];
+    c1.textContent = CC[0];
+    c2.textContent = CC[1];
+  }
+
+  function tick(now){
+    if (!running) return;
+
+    if (lastNow === null) lastNow = now;
+    const dt = now - lastNow;
+    lastNow = now;
+
+    remainingMs -= dt;
+
+    if (remainingMs <= 0){
+      remainingMs = 0;
+      running = false;
+      render();
+      status.textContent = "Terminó ✅";
+      beep();
+      cancelAnimationFrame(raf);
+      raf = null;
+      lastNow = null;
+      return;
+    }
+
+    render();
+    raf = requestAnimationFrame(tick);
+  }
+
+  function start(){
+    if (running) return;
+    if (remainingMs <= 0) remainingMs = initialMs;
+
+    if (initialMs <= 0){
+      status.textContent = "Poné un tiempo primero 😅";
+      render();
+      return;
+    }
+
+    running = true;
+    status.textContent = "Corriendo…";
+    lastNow = null;
+    raf = requestAnimationFrame(tick);
+  }
+
+  function pause(){
+    if (!running) return;
+    running = false;
+    status.textContent = "Pausado.";
+    if (raf) cancelAnimationFrame(raf);
+    raf = null;
+    lastNow = null;
+    render();
+  }
+
+  function resetTimer(){
+    pause();
+    remainingMs = initialMs;
+    render();
+    status.textContent = "Reset.";
+  }
+
+  async function toggleFull(){
+    try{
+      if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else await document.exitFullscreen();
+    }catch(e){}
+  }
+
+  async function copyLink(){
+    try{
+      await navigator.clipboard.writeText(share.value);
+      btnCopy.textContent = "Copiado ✅";
+      setTimeout(() => btnCopy.textContent = "Copiar link", 1200);
+    }catch(e){
+      share.select();
+      document.execCommand("copy");
+      btnCopy.textContent = "Copiado ✅";
+      setTimeout(() => btnCopy.textContent = "Copiar link", 1200);
+    }
+  }
+
+  // ====== Eventos ======
+  inMin.addEventListener("input", setFromInputs);
+  inSec.addEventListener("input", setFromInputs);
+
+  inTitle.addEventListener("input", () => {
+    const t = inTitle.value.trim();
+    const finalTitle = t || "El Temporizador de Google de Valen";
+    pageTitle.textContent = finalTitle;
+    document.title = finalTitle;
+    buildShareUrl();
+  });
+
+  btnStart.addEventListener("click", start);
+  btnPause.addEventListener("click", pause);
+  btnReset.addEventListener("click", resetTimer);
+  btnFull.addEventListener("click", toggleFull);
+  btnCopy.addEventListener("click", copyLink);
+
+  window.addEventListener("keydown", (e) => {
+    const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
+    if (tag === "input" || tag === "textarea") return;
+
+    if (e.code === "Space"){
+      e.preventDefault();
+      running ? pause() : start();
+    } else if (e.key.toLowerCase() === "r"){
+      resetTimer();
+    } else if (e.key.toLowerCase() === "f"){
+      toggleFull();
+    }
+  });
+
+  // ====== Init ======
+  readParams();
+  render();
+  buildShareUrl();
+})();
 </script>
 </body>
 </html>
