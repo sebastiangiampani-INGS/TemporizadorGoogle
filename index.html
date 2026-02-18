@@ -11,52 +11,51 @@
 
   <style>
     :root{
-      /* Colores oficiales Google */
       --g-blue:#4285F4;
       --g-red:#EA4335;
       --g-yellow:#FBBC05;
       --g-green:#34A853;
 
       --bg:#0f0f10;
-      --text:#ffffff;
-      --muted: rgba(255,255,255,.7);
       --panel: rgba(255,255,255,.06);
       --border: rgba(255,255,255,.12);
+      --text:#fff;
+      --muted: rgba(255,255,255,.72);
     }
 
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
       margin:0;
-      background: radial-gradient(1200px 700px at 25% 20%, rgba(66,133,244,.18), transparent 55%),
-                  radial-gradient(1200px 700px at 75% 80%, rgba(52,168,83,.14), transparent 55%),
-                  var(--bg);
+      background:
+        radial-gradient(1100px 650px at 25% 20%, rgba(66,133,244,.18), transparent 55%),
+        radial-gradient(1100px 650px at 75% 80%, rgba(52,168,83,.14), transparent 55%),
+        var(--bg);
       color:var(--text);
       font-family:"Roboto Flex", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right))
-               max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+      padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
+               max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
     }
 
     .container{
-      width:min(980px, 100%);
+      width:min(1000px, 100%);
       display:flex;
       flex-direction:column;
+      gap: 14px;
       align-items:center;
-      gap:14px;
     }
 
     h1{
       margin:0;
       font-weight:650;
-      font-size: clamp(18px, 2.2vw, 28px);
+      font-size: clamp(18px, 2.4vw, 30px);
       text-align:center;
-      letter-spacing:.2px;
     }
 
-    .timerWrap{
+    .card{
       width:100%;
       background: linear-gradient(180deg, var(--panel), rgba(255,255,255,.03));
       border: 1px solid var(--border);
@@ -65,18 +64,16 @@
       box-shadow: 0 18px 60px rgba(0,0,0,.35);
       display:flex;
       flex-direction:column;
+      gap: 12px;
       align-items:center;
-      gap: 10px;
     }
 
-    /* Display grande sin recortar */
     .timer{
       width:100%;
       display:flex;
-      align-items:center;
       justify-content:center;
-      user-select:none;
-      overflow:hidden; /* evita que “explote” */
+      align-items:center;
+      overflow:hidden;
     }
 
     .digits{
@@ -84,32 +81,25 @@
       font-variant-numeric: tabular-nums;
       font-weight:700;
       line-height:1;
-      text-align:center;
-      /* clave: se adapta al ancho y alto, sin cortar */
-      font-size: clamp(56px, 12vw, 170px);
-      letter-spacing: clamp(1px, 0.4vw, 6px);
-      text-shadow: 0 12px 40px rgba(0,0,0,.55);
       display:flex;
       align-items:baseline;
       justify-content:center;
-      gap: clamp(8px, 1.6vw, 18px);
-      flex-wrap:nowrap;
+      gap: clamp(6px, 1.3vw, 16px);
+      /* Clave responsive: no se corta */
+      font-size: clamp(52px, 12vw, 170px);
+      letter-spacing: clamp(1px, .4vw, 6px);
+      text-shadow: 0 12px 40px rgba(0,0,0,.55);
+      user-select:none;
+      white-space:nowrap;
     }
 
-    .sep{
-      color: rgba(255,255,255,.85);
-      letter-spacing: 0;
-      opacity:.85;
-      transform: translateY(-0.03em);
-    }
-    .dot{
-      color: rgba(255,255,255,.85);
-      letter-spacing: 0;
-      opacity:.85;
-      transform: translateY(-0.06em);
+    .sep,.dot{
+      color: rgba(255,255,255,.86);
+      letter-spacing:0;
+      opacity:.9;
+      transform: translateY(-0.05em);
     }
 
-    /* Colores por “bloque” */
     .blue{ color:var(--g-blue); }
     .red{ color:var(--g-red); }
     .yellow{ color:var(--g-yellow); }
@@ -119,32 +109,24 @@
       font-size: 13px;
       color: var(--muted);
       text-align:center;
-      margin-top:2px;
     }
 
-    .controls{
+    .grid{
       width:100%;
-      display:flex;
-      flex-direction:column;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
       gap: 10px;
-      align-items:center;
     }
 
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:center;
-      align-items:center;
-      width:100%;
+    @media (max-width: 680px){
+      .grid{ grid-template-columns: 1fr; }
     }
 
     .field{
       display:flex;
       flex-direction:column;
       gap:6px;
-      align-items:flex-start;
-      min-width: 120px;
+      align-items:stretch;
     }
 
     label{
@@ -152,53 +134,78 @@
       color: var(--muted);
     }
 
-    input[type="number"], input[type="text"]{
+    input[type="number"]{
+      width:100%;
       padding:10px 12px;
-      border-radius:12px;
+      border-radius: 12px;
       border: 1px solid var(--border);
       background: rgba(255,255,255,.06);
       color: var(--text);
       outline:none;
-      width: 130px;
       font-size:16px;
+      text-align:center;
     }
-    input[type="text"]{ width: min(520px, 100%); }
 
     input:focus{
-      border-color: rgba(66,133,244,.55);
+      border-color: rgba(66,133,244,.6);
       box-shadow: 0 0 0 4px rgba(66,133,244,.15);
     }
 
+    .btnRow{
+      width:100%;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    @media (max-width: 780px){
+      .btnRow{ grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 420px){
+      .btnRow{ grid-template-columns: 1fr; }
+    }
+
     button{
-      padding: 10px 14px;
+      padding: 11px 14px;
       border-radius: 12px;
       border: 1px solid transparent;
       cursor:pointer;
-      font-weight: 700;
+      font-weight: 750;
       font-size: 15px;
-      color:#111;
       transition: transform .06s ease, filter .15s ease;
     }
     button:active{ transform: translateY(1px); }
 
     .start{ background: var(--g-blue); color:#fff; }
-    .pause{ background: var(--g-yellow); }
+    .pause{ background: var(--g-yellow); color:#111; }
     .reset{ background: var(--g-red); color:#fff; }
-    .full{ background: var(--g-green); color:#fff; }
-    .copy{ background: rgba(255,255,255,.12); border:1px solid var(--border); color:#fff; }
+    .full { background: var(--g-green); color:#fff; }
 
-    .shareBox{
-      width:min(860px, 100%);
+    .shareRow{
+      width:100%;
       display:flex;
-      gap:10px;
+      gap: 10px;
       flex-wrap:wrap;
-      justify-content:center;
       align-items:center;
+      justify-content:center;
     }
+
     #share{
-      flex:1;
-      min-width: 260px;
-      width:auto;
+      flex: 1;
+      min-width: 240px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      outline:none;
+      font-size: 14px;
+    }
+
+    .copy{
+      background: rgba(255,255,255,.12);
+      border: 1px solid var(--border);
+      color: #fff;
     }
 
     .status{
@@ -207,21 +214,19 @@
       text-align:center;
     }
 
-    /* en pantallas muy bajas, achicamos un toque más */
     @media (max-height: 700px){
-      .digits{ font-size: clamp(46px, 11vw, 140px); }
-      .timerWrap{ padding: 14px; }
+      .digits{ font-size: clamp(44px, 10.8vw, 140px); }
+      .hint{ display:none; }
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1 id="pageTitle">El Temporizador de Google de Valen</h1>
+    <h1>El Temporizador de Google de Valen</h1>
 
-    <div class="timerWrap" id="timerCard">
+    <div class="card">
       <div class="timer">
-        <!-- Formato: MM:SS.CC (CC = centésimas) -->
         <div class="digits" aria-label="temporizador">
           <span class="blue"   id="m1">0</span>
           <span class="red"    id="m2">0</span>
@@ -236,47 +241,46 @@
 
       <div class="hint">Espacio = Start/Pause · R = Reset · F = Pantalla completa</div>
 
-      <div class="controls">
-        <div class="row">
-          <div class="field">
-            <label for="min">Minutos</label>
-            <input type="number" id="min" min="0" max="999" value="6">
-          </div>
-          <div class="field">
-            <label for="sec">Segundos</label>
-            <input type="number" id="sec" min="0" max="59" value="5">
-          </div>
-          <div class="field">
-            <label for="title">Título (opcional)</label>
-            <input type="text" id="title" placeholder="El Temporizador de Google de Valen">
-          </div>
+      <div class="grid">
+        <div class="field">
+          <label for="min">Minutos</label>
+          <input type="number" id="min" min="0" max="999" value="6">
         </div>
-
-        <div class="row">
-          <button class="start" id="btnStart">Start</button>
-          <button class="pause" id="btnPause">Pause</button>
-          <button class="reset" id="btnReset">Reset</button>
-          <button class="full"  id="btnFull">Pantalla completa</button>
+        <div class="field">
+          <label for="sec">Segundos</label>
+          <input type="number" id="sec" min="0" max="59" value="5">
         </div>
-
-        <div class="shareBox">
-          <input id="share" class="copy" readonly>
-          <button class="copy" id="btnCopy">Copiar link</button>
+        <div class="field">
+          <label for="cen">Centésimas (00–99)</label>
+          <input type="number" id="cen" min="0" max="99" value="0">
         </div>
-
-        <div class="status" id="status">Listo.</div>
       </div>
+
+      <div class="btnRow">
+        <button class="start" id="btnStart">Start</button>
+        <button class="pause" id="btnPause">Pause</button>
+        <button class="reset" id="btnReset">Reset</button>
+        <button class="full"  id="btnFull">Pantalla completa</button>
+      </div>
+
+      <div class="shareRow">
+        <input id="share" readonly>
+        <button class="copy" id="btnCopy">Copiar link</button>
+      </div>
+
+      <div class="status" id="status">Listo.</div>
     </div>
   </div>
 
 <script>
 (() => {
-  // ====== Utilidades ======
   const $ = (id) => document.getElementById(id);
-
   const m1 = $("m1"), m2 = $("m2"), s1 = $("s1"), s2 = $("s2"), c1 = $("c1"), c2 = $("c2");
-  const inMin = $("min"), inSec = $("sec"), inTitle = $("title");
-  const pageTitle = $("pageTitle");
+
+  const inMin = $("min");
+  const inSec = $("sec");
+  const inCen = $("cen");
+
   const share = $("share");
   const status = $("status");
 
@@ -309,91 +313,17 @@
     }catch(e){}
   }
 
-  // ====== Estado ======
-  let initialMs = 0;
+  let totalMs = 0;
   let remainingMs = 0;
   let running = false;
   let lastNow = null;
   let raf = null;
 
-  function readParams(){
-    const p = new URLSearchParams(location.search);
-
-    // ?t=365 (segundos totales)
-    // o ?m=6&s=5
-    const t = p.get("t");
-    const m = p.get("m");
-    const s = p.get("s");
-    const autostart = (p.get("autostart") === "1" || p.get("autostart") === "true");
-    const title = p.get("title");
-
-    let totalSec = null;
-
-    if (t !== null && t !== ""){
-      const v = Number(t);
-      if (Number.isFinite(v) && v >= 0) totalSec = Math.floor(v);
-    } else if (m !== null || s !== null){
-      const mm = clampInt(m ?? 0, 0, 999);
-      const ss = clampInt(s ?? 0, 0, 59);
-      totalSec = mm * 60 + ss;
-    }
-
-    if (title){
-      const tt = title.trim();
-      inTitle.value = tt;
-      pageTitle.textContent = tt || "El Temporizador de Google de Valen";
-      document.title = pageTitle.textContent;
-    } else {
-      pageTitle.textContent = "El Temporizador de Google de Valen";
-      document.title = pageTitle.textContent;
-    }
-
-    if (totalSec !== null){
-      inMin.value = String(Math.floor(totalSec / 60));
-      inSec.value = String(totalSec % 60);
-      setFromInputs();
-      if (autostart && initialMs > 0) start();
-    } else {
-      setFromInputs();
-    }
-  }
-
-  function buildShareUrl(){
-    const url = new URL(location.href);
-    url.searchParams.set("t", String(Math.floor(initialMs / 1000)));
-    const title = inTitle.value.trim();
-    if (title) url.searchParams.set("title", title);
-    else url.searchParams.delete("title");
-    url.searchParams.delete("m");
-    url.searchParams.delete("s");
-    url.searchParams.delete("autostart");
-    share.value = url.toString();
-  }
-
-  function setFromInputs(){
-    const mm = clampInt(inMin.value, 0, 999);
-    const ss = clampInt(inSec.value, 0, 59);
-    inMin.value = String(mm);
-    inSec.value = String(ss);
-
-    initialMs = (mm * 60 + ss) * 1000;
-    remainingMs = initialMs;
-
-    // si cambian inputs mientras corre: primero pausa
-    if (running) pause();
-
-    render();
-    buildShareUrl();
-    status.textContent = "Listo.";
-  }
-
   function render(){
-    const ms = Math.max(0, remainingMs|0);
+    const ms = Math.max(0, remainingMs);
     const totalSec = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSec / 60);
     const seconds = totalSec % 60;
-
-    // centésimas (00–99)
     const centis = Math.floor((ms % 1000) / 10);
 
     const MM = pad2(minutes);
@@ -408,10 +338,39 @@
     c2.textContent = CC[1];
   }
 
+  function buildLink(){
+    const url = new URL(location.href);
+    // t en segundos con 2 decimales (centésimas)
+    url.searchParams.set("t", (totalMs/1000).toFixed(2));
+    url.searchParams.delete("m");
+    url.searchParams.delete("s");
+    url.searchParams.delete("c");
+    url.searchParams.delete("autostart");
+    share.value = url.toString();
+  }
+
+  function setFromInputs(){
+    const m = clampInt(inMin.value, 0, 999);
+    const s = clampInt(inSec.value, 0, 59);
+    const c = clampInt(inCen.value, 0, 99);
+
+    inMin.value = String(m);
+    inSec.value = String(s);
+    inCen.value = String(c);
+
+    totalMs = (m*60 + s) * 1000 + (c*10);
+    remainingMs = totalMs;
+
+    if (running) pause();
+    render();
+    buildLink();
+    status.textContent = "Listo.";
+  }
+
   function tick(now){
     if (!running) return;
-
     if (lastNow === null) lastNow = now;
+
     const dt = now - lastNow;
     lastNow = now;
 
@@ -435,13 +394,13 @@
 
   function start(){
     if (running) return;
-    if (remainingMs <= 0) remainingMs = initialMs;
 
-    if (initialMs <= 0){
+    if (totalMs <= 0){
       status.textContent = "Poné un tiempo primero 😅";
-      render();
       return;
     }
+
+    if (remainingMs <= 0) remainingMs = totalMs;
 
     running = true;
     status.textContent = "Corriendo…";
@@ -461,7 +420,7 @@
 
   function resetTimer(){
     pause();
-    remainingMs = initialMs;
+    remainingMs = totalMs;
     render();
     status.textContent = "Reset.";
   }
@@ -486,17 +445,54 @@
     }
   }
 
-  // ====== Eventos ======
+  function readParams(){
+    const p = new URLSearchParams(location.search);
+
+    // ?t=10.35 (segundos.centésimas)
+    if (p.get("t")){
+      const sec = Number(p.get("t"));
+      if (Number.isFinite(sec) && sec >= 0){
+        totalMs = Math.round(sec * 1000);
+        remainingMs = totalMs;
+
+        // reflejar inputs
+        const totalSec = Math.floor(totalMs / 1000);
+        const m = Math.floor(totalSec / 60);
+        const s = totalSec % 60;
+        const c = Math.floor((totalMs % 1000) / 10);
+
+        inMin.value = String(m);
+        inSec.value = String(s);
+        inCen.value = String(c);
+      }
+    }
+
+    // ?m=1&s=30&c=50
+    if (p.get("m") || p.get("s") || p.get("c")){
+      const m = clampInt(p.get("m") ?? 0, 0, 999);
+      const s = clampInt(p.get("s") ?? 0, 0, 59);
+      const c = clampInt(p.get("c") ?? 0, 0, 99);
+
+      inMin.value = String(m);
+      inSec.value = String(s);
+      inCen.value = String(c);
+
+      totalMs = (m*60 + s)*1000 + (c*10);
+      remainingMs = totalMs;
+    }
+
+    render();
+    buildLink();
+
+    if (p.get("autostart") === "1" || p.get("autostart") === "true"){
+      start();
+    }
+  }
+
+  // Eventos
   inMin.addEventListener("input", setFromInputs);
   inSec.addEventListener("input", setFromInputs);
-
-  inTitle.addEventListener("input", () => {
-    const t = inTitle.value.trim();
-    const finalTitle = t || "El Temporizador de Google de Valen";
-    pageTitle.textContent = finalTitle;
-    document.title = finalTitle;
-    buildShareUrl();
-  });
+  inCen.addEventListener("input", setFromInputs);
 
   btnStart.addEventListener("click", start);
   btnPause.addEventListener("click", pause);
@@ -518,11 +514,11 @@
     }
   });
 
-  // ====== Init ======
+  // Init
+  setFromInputs();
   readParams();
-  render();
-  buildShareUrl();
 })();
 </script>
 </body>
 </html>
+
